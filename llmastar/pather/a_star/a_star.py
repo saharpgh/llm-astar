@@ -1,6 +1,7 @@
 
 import math
-import heapq
+import heapq 
+import torch
 
 from llmastar.env.search import env, plotting
 from llmastar.utils import is_lines_collision
