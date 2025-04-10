@@ -1,7 +1,7 @@
 import json
 import math
 import heapq
-
+import torch
 from llmastar.env.search import env, plotting
 from llmastar.model import ChatGPT, Llama3
 from llmastar.utils import is_lines_collision, list_parse
