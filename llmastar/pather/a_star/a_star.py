@@ -12,6 +12,11 @@ class AStar:
     def __init__(self):
         pass       
 
+    import heapq
+import math
+from PIL import Image, ImageDraw
+
+class AStar:
     def searching(self, query, filepath='temp.png'):
         """
         A_star Searching.
@@ -26,30 +31,28 @@ class AStar:
         self.vertical_barriers = query['vertical_barriers']
         self.range_x = query['range_x']
         self.range_y = query['range_y']
+        
+        # ایجاد محیط
         self.Env = env.Env(self.range_x[1], self.range_y[1], self.horizontal_barriers, self.vertical_barriers)  # class Env
-        self.plot = plotting.Plotting(self.s_start, self.s_goal, self.Env)
-        self.range_x[1] -= 1
-        self.range_y[1] -= 1
         self.u_set = self.Env.motions  # feasible input set
         self.obs = self.Env.obs  # position of obstacles
+
+        # تنظیمات الگوریتم A*
         self.OPEN = []  # priority queue / OPEN set
         self.CLOSED = []  # CLOSED set / VISITED order
         self.PARENT = dict()  # recorded parent
         self.g = dict()  # cost to come
         
-        
         self.PARENT[self.s_start] = self.s_start
         self.g[self.s_start] = 0
-        # self.g[self.s_goal] = math.inf
-        heapq.heappush(self.OPEN,
-                    (self.f_value(self.s_start), self.s_start))
-        
+        heapq.heappush(self.OPEN, (self.f_value(self.s_start), self.s_start))
+
         count = 0
         while self.OPEN:
             count += 1
             _, s = heapq.heappop(self.OPEN)
             self.CLOSED.append(s)
-            
+
             if s == self.s_goal:  # stop condition
                 break
 
@@ -66,12 +69,32 @@ class AStar:
                     self.PARENT[s_n] = s
                     heapq.heappush(self.OPEN, (self.f_value(s_n), s_n))
 
+        # استخراج مسیر و ویزیت‌های انجام‌شده
         path = self.extract_path(self.PARENT)
         visited = self.CLOSED
-        result = {"operation": count, "storage": len(self.g), "length": sum(self._euclidean_distance(path[i], path[i+1]) for i in range(len(path)-1))} 
+        result = {
+            "operation": count,
+            "storage": len(self.g),
+            "length": sum(self._euclidean_distance(path[i], path[i+1]) for i in range(len(path)-1))
+        }
         print(result)
-        self.plot.animation(path, visited, True, "A*", self.filepath)
+
+        # بارگذاری تصویر اصلی (تصویری که شما آپلود کرده‌اید)
+        img = Image.open(self.filepath)
+
+        # استفاده از ImageDraw برای رسم مسیر روی تصویر
+        draw = ImageDraw.Draw(img)
+
+        # رسم مسیر پیدا شده (قرمز)
+        if path:
+            for i in range(len(path) - 1):
+                draw.line([path[i][0], path[i][1], path[i+1][0], path[i+1][1]], fill="red", width=3)
+
+        # نمایش تصویر نهایی با مسیر قرمز
+        img.show()
+
         return result
+
     
     @staticmethod
     def _euclidean_distance(p1, p2):
