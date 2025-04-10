@@ -2,18 +2,19 @@ import transformers
 import torch
 
 class Llama3:
-  def __init__(self):
-    model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
-    self.pipeline = transformers.pipeline(
-        "text-generation",
-        model=model_id,
-        model_kwargs={"torch_dtype": torch.bfloat16},
-        device="cuda:3",
-    )
-    self.terminators = [
-        self.pipeline.tokenizer.eos_token_id,
-        self.pipeline.tokenizer.convert_tokens_to_ids("<|eot_id|>")
-    ]
+  def __init__(self, device="cuda"):
+        model_id = "meta-llama/Llama-3.2-3B-Instruct"
+        self.pipeline = transformers.pipeline(
+            "text-generation",
+            model=model_id,
+            tokenizer=model_id,
+            model_kwargs={"torch_dtype": torch.bfloat16},
+            device=0  # ← یا "cuda" به‌جای "cuda:3" برای Colab
+        )
+        self.terminators = [
+            self.pipeline.tokenizer.eos_token_id
+        ]
+
   
   def ask(self, prompt):
     outputs = self.pipeline(
